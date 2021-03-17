@@ -1,0 +1,42 @@
+---
+title: "Business Survey Bonaire"
+output: html_notebook
+---
+
+# Libraries
+```{r}
+library(tibble)
+library(plyr)
+library(tidyverse)
+```
+
+# Import data
+Uploaded from computer. CSV. file needs to be named to "BSB"
+Data is also converted to a tibble.
+```{r}
+BSB <- read.csv("BSB.csv", stringsAsFactors = FALSE)
+as_tibble(BSB)
+```
+
+```{r}
+variable_list<- as_tibble(names(BSB))
+dput(names(BSB))
+```
+
+# Renaming variable names
+
+```{r}
+BSB<-BSB %>% 
+  rename(
+    sector_branch = In.which.sector.or.branch.does.your.organization.operate.
+    )
+```
+
+# sector_branch
+```{r}
+sector_branch<-tibble(BSB$sector_branch)%>%
+  
+  
+sector_branch<-table(sector_branch)
+```
+
