@@ -8,6 +8,7 @@ output: html_notebook
 library(tibble)
 library(plyr)
 library(tidyverse)
+library(stringr)
 ```
 
 # Import data
@@ -20,23 +21,29 @@ as_tibble(BSB)
 
 ```{r}
 variable_list<- as_tibble(names(BSB))
-dput(names(BSB))
 ```
 
 # Renaming variable names
 
 ```{r}
-BSB<-BSB %>% 
-  rename(
-    sector_branch = In.which.sector.or.branch.does.your.organization.operate.
-    )
+BSB<-BSB%>% 
+  rename(c(
+    "In.which.sector.or.branch.does.your.organization.operate."="sector_branch",
+    "Did.you.postpone.or.accelerate.any.planned.investments.due.to.COVID.19"="planned_investments"
+    ))
 ```
 
 # sector_branch
 ```{r}
-sector_branch<-tibble(BSB$sector_branch)%>%
-  
-  
-sector_branch<-table(sector_branch)
+BSB$sector_branch <-as.factor(BSB$sector_branch)%>%
+  str_trim()
+
+table_sector_branch<-as.tibble(BSB$sector_branch)
+table_sector_branch<-table_sector_branch%>%count()
+```
+
+# Filtering
+```{r}
+BSB_F<-filter(BSB,CompletionStatus=="Partially Completed")
 ```
 
