@@ -15,7 +15,7 @@ library(stringr)
 Uploaded from computer. CSV. file needs to be named to "BSB"
 Data is also converted to a tibble.
 ```{r}
-BSB <- read.csv("BSB.csv", stringsAsFactors = FALSE)
+BSB <- read.csv("BSB1.csv", stringsAsFactors = FALSE)
 as_tibble(BSB)
 ```
 
@@ -35,15 +35,56 @@ BSB<-BSB%>%
 
 # sector_branch
 ```{r}
+BSB$sector_branch <- BSB$In.which.sector.or.branch.does.your.organization.operate.
+BSB$converted_ISIC <- BSB$In.which.sector.or.branch.does.your.organization.operate.
+
+
+
 BSB$sector_branch <-as.factor(BSB$sector_branch)%>%
   str_trim()
 
-table_sector_branch<-as.tibble(BSB$sector_branch)
-table_sector_branch<-table_sector_branch%>%count()
+table_sector_branch<-as.tibble(BSB$sector_branch)%>%
+  count()
+
+table(BSB$Converted_ISIC,BSB$CompletionStatus)
 ```
 
 # Filtering
 ```{r}
-BSB_F<-filter(BSB,CompletionStatus=="Partially Completed")
+BSB_F<-filter(BSB,CompletionStatus=="Completed")
+```
+
+```{r}
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Efficient.management.import.export)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Better.improved.technological.support..ICT.)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Continued.support.measures.after.July.12..2021)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Coordinated.marketing.support)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Ensure.Covid.19.vaccination)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Other...Other)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Nothing)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Open.the.borders.without.limitations)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Coordinated.marketing.support)
+table(BSB_F$What.are.the.most.important.steps.the.government.can.take.to.help.your.business.get.back.on.its.feet....Implement.a.travel.bubble)
+
+```
+
+```{r}
+table(BSB_F$When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.)
+```
+
+
+```{r}
+table(BSB_F$What.percentage.of.your.employees.were.able.to.work.at.least.in.part.remotely..from.home..in.2020.)
+```
+
+```{r}
+table(BSB_F$Annual.turnover.revenue.in.2019.)
+table(BSB_F$Annual.turnover.revenue.in.2020.)
+table(BSB_F$Annual.expenditures.in.2019.)
+table(BSB_F$Annual.expenditures.in.2020.)
+```
+
+```{r}
+
 ```
 
