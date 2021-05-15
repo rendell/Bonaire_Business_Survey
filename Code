@@ -168,15 +168,32 @@ cbind<- BSB_F %>%
 ggbetweenstats(cbind,SML,
 Income_loss_2020, outlier.tagging = TRUE)
 
+ggbetweenstats(cbind,SML,
+How.many.employees.did.you.have.on.January.1..2020., outlier.tagging = TRUE)
+
 
 Q <- quantile(na.omit(cbind$Income_loss_2020), probs=c(.25, .75), na.rm = FALSE)
 iqr <- IQR(na.omit(cbind$Income_loss_2020))
 
+Q2 <- quantile(na.omit(cbind$How.many.employees.did.you.have.on.January.1..2020.), probs=c(.25, .75), na.rm = FALSE)
+iqr2 <- IQR(na.omit(cbind$How.many.employees.did.you.have.on.January.1..2020.))
+
+
 up <-  Q[2]+1.5*iqr # Upper Range  
 low<- Q[1]-1.5*iqr # Lower Range
 
+up2 <-  Q2[2]+1.5*iqr2 # Upper Range  
+low2<- Q2[1]-1.5*iqr2 # Lower Range
+
+
 eliminated<- subset(cbind, cbind$Income_loss_2020 > (Q[1] - 1.5*iqr) & cbind$Income_loss_2020 < (Q[2]+1.5*iqr))
 ggbetweenstats(eliminated, SML, Income_loss_2020, outlier.tagging = TRUE) 
+
+eliminated2<- subset(eliminated, eliminated$How.many.employees.did.you.have.on.January.1..2020. > (Q2[1] - 1.5*iqr2) & eliminated$How.many.employees.did.you.have.on.January.1..2020. < (Q2[2]+1.5*iqr2))
+ggbetweenstats(eliminated2, SML, How.many.employees.did.you.have.on.January.1..2020., outlier.tagging = TRUE) 
+
+
+
 
 
 
@@ -192,6 +209,22 @@ table_income_loss_2020 <- eliminated %>%
             avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
             )
 
+
+
+table_income_loss_2020_t2 <- eliminated2 %>% 
+  group_by(SML) %>% 
+  summarise(avg_income_loss=mean(Income_loss_2020,na.rm = TRUE),
+            avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
+            )
+
+
+table_income_loss_2020_2 <- eliminated2 %>% 
+  summarise(avg_income_loss=mean(Income_loss_2020,na.rm = TRUE),
+            avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
+            )
+
+
 write.csv(eliminated,file="observations_income_loss_2020.csv")
 
 ```
+
