@@ -159,7 +159,7 @@ BSB_F$Income_loss_2020 <-
 
 # Summarize
 cbind<- BSB_F %>% 
-  select(Income_loss_2020,Annual.turnover.revenue.in.2019.,Annual.turnover.revenue.in.2020., SML, Thank.you.very.much.for.your.cooperation...Company.name)
+  select(Income_loss_2020,Annual.turnover.revenue.in.2019.,Annual.turnover.revenue.in.2020., SML, Thank.you.very.much.for.your.cooperation...Company.name, How.many.employees.did.you.have.on.January.1..2020.)
 
 # cbind<-cbind[-c(113,415)]
 
@@ -182,11 +182,15 @@ ggbetweenstats(eliminated, SML, Income_loss_2020, outlier.tagging = TRUE)
 
 table_income_loss_2020_t <- eliminated %>% 
   group_by(SML) %>% 
-  summarise(avg=mean(Income_loss_2020,na.rm = TRUE))
+  summarise(avg_income_loss=mean(Income_loss_2020,na.rm = TRUE),
+            avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
+            )
 
 
 table_income_loss_2020 <- eliminated %>% 
-  summarise(avg=mean(Income_loss_2020,na.rm = TRUE))
+  summarise(avg_income_loss=mean(Income_loss_2020,na.rm = TRUE),
+            avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
+            )
 
 write.csv(eliminated,file="observations_income_loss_2020.csv")
 
