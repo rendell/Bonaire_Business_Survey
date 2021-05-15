@@ -9,6 +9,7 @@ library(tibble)
 library(plyr)
 library(tidyverse)
 library(stringr)
+library(ggstatsplot)
 ```
 
 # Import data
@@ -105,4 +106,88 @@ BSB_F<- BSB_F %>%
                                "More than $ 2.000.000" = "Large"),
 
     SML = factor(SML, levels=c("Small","Medium","Large")))
+```
+
+# Loss of income
+```{r}
+# Revenue 2019
+BSB_F<- BSB_F%>%
+  mutate(Annual.turnover.revenue.in.2019.=fct_recode(Annual.turnover.revenue.in.2019.,
+                               "5000"="Lower than $ 10.000",
+                               "30000"="Between $ 10.000 and $ 49.999",
+                               "74500"="Between $ 50.000 and $ 99.000" ,
+                               "149500"="Between $ 100.000 and $ 199.000",
+                               "275000"="Between $ 200.000 and $ 349.999",
+                               "425000"="Between $ 350.000 and $ 499.999" ,
+                               "625000"="Between $ 500.000 and 749.999",
+                               "875000"="Between $ 750.000 and $ 999.999",
+                               "1250000"="Between $ 1.000.000 and $ 1.499.999",
+                               "1750000"="Between $ 1.500.000 and $ 1.999.999",
+                               "2500000"="More than $ 2.000.000",
+                               "NA"="Unsure / Do not want to answer",
+                               "NA"=""
+  ))
+
+BSB_F$Annual.turnover.revenue.in.2019.<- as.numeric(levels(BSB_F$Annual.turnover.revenue.in.2019.))[BSB_F$Annual.turnover.revenue.in.2019.]
+
+
+
+# Revenue 2020
+BSB_F<- BSB_F%>%
+  mutate(Annual.turnover.revenue.in.2020.=fct_recode(Annual.turnover.revenue.in.2020.,
+                               "5000"="Lower than $ 10.000",
+                               "30000"="Between $ 10.000 and $ 49.999",
+                               "74500"="Between $ 50.000 and $ 99.000" ,
+                               "149500"="Between $ 100.000 and $ 199.000",
+                               "275000"="Between $ 200.000 and $ 349.999",
+                               "425000"="Between $ 350.000 and $ 499.999" ,
+                               "625000"="Between $ 500.000 and 749.999",
+                               "875000"="Between $ 750.000 and $ 999.999",
+                               "1250000"="Between $ 1.000.000 and $ 1.499.999",
+                               "1750000"="Between $ 1.500.000 and $ 1.999.999",
+                               "2500000"="More than $ 2.000.000",
+                               "NA"="Unsure / Do not want to answer",
+                               "NA"=""
+  ))
+
+BSB_F$Annual.turnover.revenue.in.2020.<- as.numeric(levels(BSB_F$Annual.turnover.revenue.in.2020.))[BSB_F$Annual.turnover.revenue.in.2020.]
+
+
+# Loss of revenue in percent
+BSB_F$Income_loss_2020 <- 
+  (BSB_F$Annual.turnover.revenue.in.2020. / BSB_F$Annual.turnover.revenue.in.2019. - 1) *100
+
+# Summarize
+cbind<- BSB_F %>% 
+  select(Income_loss_2020,Annual.turnover.revenue.in.2019.,Annual.turnover.revenue.in.2020., SML, Thank.you.very.much.for.your.cooperation...Company.name)
+
+# cbind<-cbind[-c(113,415)]
+
+# Removing outliers: https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/
+
+ggbetweenstats(cbind,SML,
+Income_loss_2020, outlier.tagging = TRUE)
+
+
+Q <- quantile(na.omit(cbind$Income_loss_2020), probs=c(.25, .75), na.rm = FALSE)
+iqr <- IQR(na.omit(cbind$Income_loss_2020))
+
+up <-  Q[2]+1.5*iqr # Upper Range  
+low<- Q[1]-1.5*iqr # Lower Range
+
+eliminated<- subset(cbind, cbind$Income_loss_2020 > (Q[1] - 1.5*iqr) & cbind$Income_loss_2020 < (Q[2]+1.5*iqr))
+ggbetweenstats(eliminated, SML, Income_loss_2020, outlier.tagging = TRUE) 
+
+
+
+table_income_loss_2020_t <- eliminated %>% 
+  group_by(SML) %>% 
+  summarise(avg=mean(Income_loss_2020,na.rm = TRUE))
+
+
+table_income_loss_2020 <- eliminated %>% 
+  summarise(avg=mean(Income_loss_2020,na.rm = TRUE))
+
+write.csv(eliminated,file="observations_income_loss_2020.csv")
+
 ```
