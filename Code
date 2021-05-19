@@ -85,6 +85,8 @@ table(BSB_F$Annual.turnover.revenue.in.2020.)
 table(BSB_F$Annual.expenditures.in.2019.)
 table(BSB_F$Annual.expenditures.in.2020.)
 ```
+
+
 # Creating Small/Medium/Large enterprise classification
 Using the turnover 2020 classification
 ```{r}
@@ -163,10 +165,10 @@ cbind<- BSB_F %>%
          Annual.turnover.revenue.in.2020., 
          SML, 
          Thank.you.very.much.for.your.cooperation...Company.name, How.many.employees.did.you.have.on.January.1..2020.,
-         When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.
+         When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.,
+         Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.,
+         Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.
          )
-
-# cbind<-cbind[-c(113,415)]
 
 # Removing outliers: https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/
 
@@ -209,3 +211,64 @@ table_expect_return <- cbind %>%
 
 
 write.csv(eliminated,file="observations_income_loss_2020.csv")
+
+```
+
+# Questions for Florencia:
+10. What was the impact of COVID-19 on the deliverability (logistics) of goods and services to your company in 2020?
+11.Did you postpone or accelerate any planned investments due to COVID-19
+13.What types of difficulties did you encounter in gettingyour products / services to market in 2020 as a result ofCOVID-19, compared to 2019?
+```{r}
+table(BSB_F$What.was.the.impact.of.COVID.19.on.the.deliverability..logistics..of.goods.and.services.to.your.company.in.2020.....Reduced.reliability.of.delivery) #reduced reliability
+
+table(BSB_F$What.was.the.impact.of.COVID.19.on.the.deliverability..logistics..of.goods.and.services.to.your.company.in.2020.....No.impact) # No impact
+
+table(BSB_F$What.was.the.impact.of.COVID.19.on.the.deliverability..logistics..of.goods.and.services.to.your.company.in.2020.....No.reliability.of.delivery) # no reliability delivery
+
+table(BSB_F$What.was.the.impact.of.COVID.19.on.the.deliverability..logistics..of.goods.and.services.to.your.company.in.2020.....Other...Other) # Other
+
+table(BSB_F$What.was.the.impact.of.COVID.19.on.the.deliverability..logistics..of.goods.and.services.to.your.company.in.2020.....Increased.costs.of.delivery) # Increased cost of delivery
+
+
+table(BSB_F$Did.you.postpone.or.accelerate.any.planned.investments.due.to.COVID.19)
+
+
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Lack.of.physical.contact) # Lack of physical contact
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Cost.of.delivery)         # Cost.of.delivery
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Limitations.of.opening.hours)    # Limitations of opening hours
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Limited.customers..market)   # Limited customers, market
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....No.difficulties) # No difficulties
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Planning.constraints.due.to.unstable.situation) # Planning constraints
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Overcome.consumer.fear.of.contagion) # Overcome consumer fear
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Planning.constraints.due.to.unstable.situation) # Planning constraints due to unstable situation
+table(BSB_F$What.types.of.difficulties.did.you.encounter.in.getting.your.products...services.to.market.in.2020.as.a.result.of.COVID.19..compared.to.2019....Other...Other) # No difficulties
+```
+
+```{r}
+table(BSB_F$By.what.type.of.business.insurance.is.your.business.covered....Business.continuity...loss.of.income.insurance)
+table(BSB_F$By.what.type.of.business.insurance.is.your.business.covered....Business.property.insurance)
+table(BSB_F$By.what.type.of.business.insurance.is.your.business.covered....None)
+table(BSB_F$By.what.type.of.business.insurance.is.your.business.covered....Other...Other)
+```
+
+```{r}
+table(BSB_F$Could.you.give.an.estimate.of.the.loss.of.revenue..in.percentage..in.2020.as.a.result.of.COVID.19..compared.to.2019.)
+```
+
+```{r}
+table(BSB_F$Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.)
+table(BSB_F$Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.)
+
+
+
+table_req_perm <- cbind %>%
+  filter(!is.na(SML))%>%
+  group_by(SML)%>%
+  count(Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.)
+
+table_req_temp <- cbind %>%
+  filter(!is.na(SML))%>%
+  group_by(SML)%>%
+  count(Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.)
+
+```
