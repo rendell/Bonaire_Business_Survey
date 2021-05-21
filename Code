@@ -282,6 +282,24 @@ cross tabulate with imcone derving question (question 7)
 
 
 ```{r}
+BSB_F<- BSB_F%>%
+  mutate(Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..80..allowance.for.wage.costs,
+                               "Compensation"="SZW Emergency scheme, 80% allowance for wage costs")
+  
+   
+   
+BSB_F$Recieved_compensation <-   if (!is.null(BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..80..allowance.for.wage.costs)||
+                                     !is.null(BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..for.independent.entrepreneurs
+       )) {"YES"}
+
+
+         
+         
+BSB_F$Recieved_financing_relief <-
+
+
+BSB_F$Recieved_non<-
+
+
 
 ```
-
