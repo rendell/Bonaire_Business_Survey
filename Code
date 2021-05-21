@@ -272,3 +272,16 @@ table_req_temp <- cbind %>%
   count(Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.)
 
 ```
+
+# Effectiveness of relief to businesses chart
+
+Tabulate results of question 7 for comparison purposes
+Question 3: SZW and EZK options toegether (yes received compensation), second catetgory (Yes, financing relief) BMKB or GO +Qredits+Postponement of payment by the Caribbean Netherlands Tax , 3 No + blank
+
+cross tabulate with imcone derving question (question 7)
+
+
+```{r}
+
+```
+
