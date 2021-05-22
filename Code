@@ -282,36 +282,55 @@ cross tabulate with imcone derving question (question 7)
 
 
 ```{r}
-cbind$Recieved_compensation <-   if(
-  BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..80..allowance.for.wage.costs=="SZW Emergency scheme, 80% allowance for wage costs" {
-  "YES"
-  
-  || BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..for.independent.entrepreneurs=="SZW Emergency scheme, for independent entrepreneurs",
-                                     "YES",
-                                     "NO"
-  )
-
-
-
-  
-if(x > y) {
-  print("x is greater")
-} else if(x < y) {
-  print("y is greater")
-} else {
-  print("x and y are equal")
-}
-
+# Recieved compensation (SZW and EZK measures)
+cbind$Recieved_compensation <-ifelse(
+  BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..80..allowance.for.wage.costs=="SZW Emergency scheme, 80% allowance for wage costs" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..for.independent.entrepreneurs=="SZW Emergency scheme, for independent entrepreneurs" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation..fourth.installment....425.....400.000.=="EZK compensation for fixed costs ($ 4.400 variant)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation.for.fixed.costs....2.200.variant.=="EZK compensation for fixed costs ($ 2.200 variant)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation..third.installment....375.....99.000.=="EZK compensation, third installment ($ 375 - $ 99.000)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation..second.installment....500.....55.000.=="EZK compensation, second installment ($ 500 - $ 55.000)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation.for.fixed.costs....4.400.variant.=="EZK compensation for fixed costs ($ 4.400 variant)",
+  "YES",
+  "NO"
+  ) 
 
   
-  
+# Recieved financing relief (BMKB or GO and Qredits and postponement tax) 
+# Upon inspection of the BMKB or Go, there were not a single observation there
+cbind$Recieved_financing_relief <-ifelse(
+  BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....Qredits.grace.period.and.or.a.bridging.loan=="Qredits grace period and/or a bridging loan" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....Postponement.of.payment.by.the.Caribbean.Netherlands.Tax.authorities.for.3.months=="Postponement of payment by the Caribbean Netherlands Tax authorities for 3 months",
+  "YES",
+  "NO"
 )
-         
-BSB_F$Recieved_financing_relief <-
 
 
-BSB_F$Recieved_non<-
+cbind$Recieved_non<-ifelse(cbind$Recieved_compensation=="YES" |
+                         cbind$Recieved_financing_relief=="YES",
+                         "Recieved",
+                         "Not_recieved"
+)
 
 
+cbind$Revenue_loss_2020 <- BSB_F$Could.you.give.an.estimate.of.the.loss.of.revenue..in.percentage..in.2020.as.a.result.of.COVID.19..compared.to.2019.
 
+# Table
+table_recieved_cross <- cbind %>%
+  filter(!is.na(Revenue_loss_2020))%>%
+  group_by(Revenue_loss_2020)%>%
+  count(Recieved_compensation)%>%
+  spread(Recieved_compensation,n)
+
+table_relief_cross <- cbind %>%
+  filter(!is.na(Revenue_loss_2020))%>%
+  group_by(Revenue_loss_2020)%>%
+  count(Recieved_financing_relief)%>%
+  spread(Recieved_financing_relief,n)
+
+table_recieved_non_cross <- cbind %>%
+  filter(!is.na(Revenue_loss_2020))%>%
+  group_by(Revenue_loss_2020)%>%
+  count(Recieved_non)%>%
+  spread(Recieved_non,n)
 ```
