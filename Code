@@ -334,3 +334,41 @@ table_recieved_non_cross <- cbind %>%
   count(Recieved_non)%>%
   spread(Recieved_non,n)
 ```
+
+
+#Logit regression
+```{r}
+#Character variables had to be converted to factor first
+cbind$Revenue_loss_2020 <- as.factor(cbind$Revenue_loss_2020)
+
+# Logit model
+cbind$Recieved_compensation <- as.factor(cbind$Recieved_compensation)
+model_logit <- glm(Recieved_compensation ~ Revenue_loss_2020,family=binomial(link='logit'),data=cbind)
+summary(model_logit)
+
+
+# Probit model
+model_probit <- glm(Recieved_compensation ~ Revenue_loss_2020,family=binomial(link='probit'),data=cbind)
+summary(model_probit)
+```
+
+# Wald test
+
+We can test for an overall effect of rank using the wald.test function of the aod library. The order in which the coefficients are given in the table of coefficients is the same as the order of the terms in the model. This is important because the wald.test function refers to the coefficients by their order in the model. We use the wald.test function. b supplies the coefficients, while Sigma supplies the variance covariance matrix of the error terms, finally Terms tells R which terms in the model are to be tested, in this case, terms 4, 5, and 6, are the three terms for the levels of rank.
+
+wald.test(b = coef(myprobit), Sigma = vcov(myprobit), Terms = 4:6)
+## Wald test:
+## ----------
+## 
+## Chi-squared test:
+## X2 = 21.4, df = 3, P(> X2) = 8.9e-05
+The chi-squared test statistic of 21.4 with three degrees of freedom is associated with a p-value of less than 0.001 indicating that the overall effect of rank is statistically significant.
+
+source: https://stats.idre.ucla.edu/r/dae/probit-regression/
+```{r}
+library("aod")
+wald.test(b=coef(model_probit), Sigma=vcov(model_probit), Terms = 4:6)
+```
+For a Chi-square test, a p-value that is less than or equal to your significance level indicates there is sufficient evidence to conclude that the observed distribution is not the same as the expected distribution. You can conclude that a relationship exists between the categorical variables.
+
+The chi-squared test statistic of 32.3.4 with three degrees of freedom is associated with a p-value of less than 0.001 indicating that the overall effect of rank is statistically significant.
