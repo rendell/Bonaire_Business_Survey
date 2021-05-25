@@ -337,6 +337,8 @@ table_recieved_non_cross <- cbind %>%
 
 
 #Logit regression
+Reference used: https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/
+
 ```{r}
 #Character variables had to be converted to factor first
 cbind$Revenue_loss_2020 <- as.factor(cbind$Revenue_loss_2020)
@@ -372,3 +374,35 @@ wald.test(b=coef(model_probit), Sigma=vcov(model_probit), Terms = 4:6)
 For a Chi-square test, a p-value that is less than or equal to your significance level indicates there is sufficient evidence to conclude that the observed distribution is not the same as the expected distribution. You can conclude that a relationship exists between the categorical variables.
 
 The chi-squared test statistic of 32.3.4 with three degrees of freedom is associated with a p-value of less than 0.001 indicating that the overall effect of rank is statistically significant.
+
+
+# Request Nancy
+Questions 19 to 23
+
+19. How many employees did you have on January 1, 2020?
+20. How many employees did you have to let go in 2020 as a result of COVID-19, compared to 2019?
+21. What percentage of your employees are makign use of the 80% SZW Emergency funds?
+22. How many employees do yo itnend to hire or re-hire and when do you think that will take place?
+23. Could you estimate the number of weeks of absent employees due to quarantine during 2020?
+
+```{r}
+#19 - 20
+table(BSB_F$How.many.employees.did.you.have.on.January.1..2020.)
+table(BSB_F$How.many.employees.did.you.have.to.let.go.in.2020.as.a.result.of.COVID.19..compared.to.2019.)
+
+BSB_F$employee_loss <- BSB_F$How.many.employees.did.you.have.to.let.go.in.2020.as.a.result.of.COVID.19..compared.to.2019. / BSB_F$How.many.employees.did.you.have.on.January.1..2020. * 100
+
+cbind$employee_loss <- replace(BSB_F$employee_loss, BSB_F$employee_loss > 100, NA)
+
+plot_job_loss_SML <- ggplot(na.omit(cbind), aes(x=SML, y=employee_loss)) + 
+  geom_violin(fill="#009CA7", color='#F78D28')+ geom_boxplot(width=0.1, fill='#F05023', color='#F78D28')+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
+plot_job_loss_TOT <- boxplot(cbind$employee_loss, main ="Distribution job loss in 2020")
+
+
+#21
+table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q1..2021.)
+table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q2..2020.)
+table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q3..2020.)
+table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emerge
