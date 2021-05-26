@@ -352,6 +352,11 @@ summary(model_logit)
 # Probit model
 model_probit <- glm(Recieved_compensation ~ Revenue_loss_2020,family=binomial(link='probit'),data=cbind)
 summary(model_probit)
+
+
+# Table
+library(gtsummary)
+
 ```
 
 # Wald test
@@ -405,4 +410,12 @@ plot_job_loss_TOT <- boxplot(cbind$employee_loss, main ="Distribution job loss i
 table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q1..2021.)
 table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q2..2020.)
 table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q3..2020.)
-table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emerge
+table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q4..2020.)
+```
+
+# Question 2: principal activity related to tourism
+```{r}
+cbind$not_tourism_related <- BSB_F$If.the.principal.activity.of.your.organization.is.related.to.tourism..can.you.indicate.which.of.the.following.subsectors.are.the.most.important.sector.in.which.you.are.active....My.principal.activity..is.not.related.to.tourism
+
+table(cbind$SML,cbind$not_tourism_related)
+```
