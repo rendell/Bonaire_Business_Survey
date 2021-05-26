@@ -418,4 +418,62 @@ table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emer
 cbind$not_tourism_related <- BSB_F$If.the.principal.activity.of.your.organization.is.related.to.tourism..can.you.indicate.which.of.the.following.subsectors.are.the.most.important.sector.in.which.you.are.active....My.principal.activity..is.not.related.to.tourism
 
 table(cbind$SML,cbind$not_tourism_related)
+
+cbind$tourism_related <- replace(cbind$not_tourism_related,cbind$not_tourism_related =="","Tourism related")
+  
+  cbind$employee_loss <- replace(BSB_F$employee_loss, BSB_F$employee_loss > 100, NA)
+```
+
+# 6. What caused your loss of revenue in 2020 as a result of
+COVID-19, compared to 2019?
+```{r}
+# Append variables to cbind dataset
+cbind$cause_low_demand <- BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Low.demand..loss.of.customers.
+
+cbind$cause_shortage_inputs <- BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Shortage.of.production.inputs..supply.
+
+cbind$cause_bus_closure <- BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Store.business..partial..closure
+
+cbind$cause_prod_employ <-BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Loss.of.productivity.due.to.less.employees..quarantined..sick.with.COVID.19.or.otherwise.unavailable.because.of.COVID.19.
+
+cbind$cause_prod_compliance <-BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Loss.of.productivity.due.to.compliance.with.COVID.19.protocols..for.example..less.tables.in.restaurant..less.hours.open..etc..
+
+cbind$cause_other <-BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Other...Other
+
+cbind$cause_non <-BSB_F$What.caused.your.loss.of.revenue.in.2020.as.a.result.of.COVID.19..compared.to.2019.....Did.not.experience.loss.of.revenue
+
+table_6_a<-table(cbind$cause_low_demand, cbind$tourism_related)%>%
+  as.data.frame()
+
+table_6_b<-table(cbind$cause_shortage_inputs, cbind$tourism_related)%>%
+  as.data.frame()
+
+table_6_c<-table(cbind$cause_bus_closure, cbind$tourism_related)%>%
+  as.data.frame()
+
+table_6_d<-table(cbind$cause_prod_employ, cbind$tourism_related)%>%
+  as.data.frame()
+
+table_6_e<-table(cbind$cause_prod_compliance, cbind$tourism_related)%>%
+  as.data.frame()
+
+table_6_f<-table(cbind$cause_other, cbind$tourism_related)%>%
+  as.data.frame()
+
+table_6_g<-table(cbind$cause_non, cbind$tourism_related)%>%
+  as.data.frame()
+```
+
+# Summary table average income loss tourism
+```{r}
+table_sum_av_inc_loss <- cbind %>%
+  group_by(tourism_related)%>%
+  summarise(avg=mean(na.omit(Income_loss_2020)))
+```
+
+# where you required to cease operations
+```{r}
+table_cease_perm_sector <- cbind %>%
+  group_by(Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.)%>%
+  count(tourism_related)
 ```
