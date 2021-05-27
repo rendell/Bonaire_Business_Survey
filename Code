@@ -15,7 +15,7 @@ library(ggstatsplot)
 # Import data
 Uploaded from computer. CSV. file needs to be named to "BSB"
 Data is also converted to a tibble.
-```{r}
+```{r, message=FALSE}
 setwd("C:/Users/RendelldeKort/Desktop/BSB")
 BSB <- read.csv("BSB1.csv", stringsAsFactors = FALSE)
 as_tibble(BSB)
@@ -376,6 +376,10 @@ summary(model_probit)
 # Table
 library(gtsummary)
 
+tbl_regression(model_logit,
+    exponentiate = TRUE)
+  
+
 ```
 
 # Wald test
@@ -393,11 +397,11 @@ The chi-squared test statistic of 21.4 with three degrees of freedom is associat
 source: https://stats.idre.ucla.edu/r/dae/probit-regression/
 ```{r}
 library("aod")
-wald.test(b=coef(model_probit), Sigma=vcov(model_probit), Terms = 4:6)
+wald.test(b=coef(model_logit), Sigma=vcov(model_logit), Terms = 4:6)
 ```
 For a Chi-square test, a p-value that is less than or equal to your significance level indicates there is sufficient evidence to conclude that the observed distribution is not the same as the expected distribution. You can conclude that a relationship exists between the categorical variables.
 
-The chi-squared test statistic of 32.3.4 with three degrees of freedom is associated with a p-value of less than 0.001 indicating that the overall effect of rank is statistically significant.
+The chi-squared test statistic of 30.3 with three degrees of freedom is associated with a p-value of less than 0.001 indicating that the overall effect of rank is statistically significant.
 
 
 # Request Nancy
@@ -496,3 +500,4 @@ table_cease_perm_sector <- cbind %>%
   group_by(Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.)%>%
   count(tourism_related)
 ```
+
