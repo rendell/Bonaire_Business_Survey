@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 # Libraries
-```{r}
+```{r, message=FALSE}
 library(tibble)
 library(plyr)
 library(tidyverse)
@@ -255,6 +255,8 @@ table(BSB_F$By.what.type.of.business.insurance.is.your.business.covered....Other
 table(BSB_F$Could.you.give.an.estimate.of.the.loss.of.revenue..in.percentage..in.2020.as.a.result.of.COVID.19..compared.to.2019.)
 ```
 
+
+# 4-5  Required to cease operations permanently or temporarily
 ```{r}
 table(BSB_F$Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.)
 table(BSB_F$Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.)
@@ -270,6 +272,23 @@ table_req_temp <- cbind %>%
   filter(!is.na(SML))%>%
   group_by(SML)%>%
   count(Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.)
+
+#Permanent OR temporary
+cbind$per_temp <- ifelse(
+  cbind$Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.=="Yes"  |
+    cbind$Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.=="Yes", "YES",
+  "NO"
+)
+
+table(cbind$per_temp)
+
+table_per_temp_SML <- cbind %>%
+  group_by(SML)%>%
+  count(per_temp)
+
+table_per_temp_tour_related <- cbind %>%
+  group_by(tourism_related)%>%
+  count(per_temp)
 
 ```
 
