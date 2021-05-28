@@ -178,15 +178,11 @@ Income_loss_2020, outlier.tagging = TRUE)
 ggbetweenstats(cbind,SML,
 How.many.employees.did.you.have.on.January.1..2020., outlier.tagging = TRUE)
 
-
 Q <- quantile(na.omit(cbind$Income_loss_2020), probs=c(.25, .75), na.rm = FALSE)
 iqr <- IQR(na.omit(cbind$Income_loss_2020))
 
 up <-  Q[2]+1.5*iqr # Upper Range  
 low<- Q[1]-1.5*iqr # Lower Range
-
-
-
 
 eliminated<- subset(cbind, cbind$Income_loss_2020 > (Q[1] - 1.5*iqr) & cbind$Income_loss_2020 < (Q[2]+1.5*iqr))
 ggbetweenstats(eliminated, SML, Income_loss_2020, outlier.tagging = TRUE) 
@@ -211,7 +207,6 @@ table_expect_return <- cbind %>%
 
 
 write.csv(eliminated,file="observations_income_loss_2020.csv")
-
 ```
 
 # Questions for Florencia:
@@ -298,8 +293,6 @@ Tabulate results of question 7 for comparison purposes
 Question 3: SZW and EZK options toegether (yes received compensation), second catetgory (Yes, financing relief) BMKB or GO +Qredits+Postponement of payment by the Caribbean Netherlands Tax , 3 No + blank
 
 cross tabulate with imcone derving question (question 7)
-
-
 ```{r}
 # Recieved compensation (SZW and EZK measures)
 cbind$Recieved_compensation <-ifelse(
@@ -423,11 +416,31 @@ BSB_F$employee_loss <- BSB_F$How.many.employees.did.you.have.to.let.go.in.2020.a
 cbind$employee_loss <- replace(BSB_F$employee_loss, BSB_F$employee_loss > 100, NA)
 
 plot_job_loss_SML <- ggplot(na.omit(cbind), aes(x=SML, y=employee_loss)) + 
-  geom_violin(fill="#009CA7", color='#F78D28')+ geom_boxplot(width=0.1, fill='#F05023', color='#F78D28')+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  geom_violin(fill="#009CA7", color='#F78D28')+ 
+  geom_boxplot(width=0.1, fill='#F05023', color='#F78D28')+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
 panel.background = element_blank(), axis.line = element_line(colour = "black"))
 
 plot_job_loss_TOT <- boxplot(cbind$employee_loss, main ="Distribution job loss in 2020")
 
+#table / grouping medium and large (S_ML)
+cbind$S_ML <-ifelse(
+  cbind$SML=="Medium" |
+    cbind$SML=="Large",
+  "Medium-Large",
+  "Small"
+)
+
+table_avg_job_loss_S_ML <- cbind %>%
+  group_by(S_ML)%>%
+  summarise(avg=mean(na.omit(employee_loss)))
+
+table_avg_job_loss <- cbind %>%
+  summarise(avg=mean(na.omit(employee_loss)))
+
+plot_job_loss_S_ML <- ggplot(na.omit(cbind), aes(x=S_ML, y=employee_loss)) + 
+  geom_violin(fill="#009CA7", color='#F78D28')+ 
+  geom_boxplot(width=0.1, fill='#F05023', color='#F78D28')+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(), axis.line = element_line(colour = "black"))
 
 #21
 table(BSB_F$What.percentage.of.your.employees.are.making.use.of.the.80..SZW.Emergency.Funds..Q1..2021.)
@@ -500,4 +513,6 @@ table_cease_perm_sector <- cbind %>%
   group_by(Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.)%>%
   count(tourism_related)
 ```
+
+
 
