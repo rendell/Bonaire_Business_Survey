@@ -77,6 +77,12 @@ table(BSB_F$When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.)
 
 ```{r}
 table(BSB_F$What.percentage.of.your.employees.were.able.to.work.at.least.in.part.remotely..from.home..in.2020.)
+
+cbind$remote <- BSB_F$What.percentage.of.your.employees.were.able.to.work.at.least.in.part.remotely..from.home..in.2020.
+
+table_remote_tour_not <- cbind %>%
+  group_by(tourism_related)%>%
+  count(remote)
 ```
 
 ```{r}
