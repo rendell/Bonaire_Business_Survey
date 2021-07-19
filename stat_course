@@ -1,42 +1,55 @@
 ---
-title: "Statistics course exerc"
+title: "Financial compensation assistance to firms post-COVID in Bonaire"
 output:
   word_document: default
   html_document:
     df_print: paged
 ---
 
-Continuation business survey analysis
-Attempted ANOVA:
+# Did the financial compensation assistance reach the beneficiary firms most in need?
+
+
+## Introduction
+A key question is whether the government assistance offered reached those businesses that were most severely affected in terms of reduced earnings due to the COVID-19 pandemic. Related is the assertion that perhaps small businesses (that were more vulnerable) were less likely to have received assistance.
+
+
+
+
+
+This project was part of a statistical class where the Bonaire business survey was used for further experimentation.
+
+
+Continuation business survey analysis attempted ANOVA:
 https://www.scribbr.com/statistics/anova-in-r/
 
-
-
-
-```{r}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 library(ggplot2)
 library(ggpubr)
 library(tidyverse)
 library(broom)
 library(AICcmodavg)
+library(ggstatsplot)
+library(gtsummary)
 ```
 
-# Import data
-Uploaded from computer. CSV. file needs to be named to "BSB"
-Data is also converted to a tibble.
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+# Uploaded from computer. CSV. file needs to be named to "BSB"
+# Data is also converted to a tibble for ease in handling.
+
 setwd("C:/Users/RendelldeKort/Desktop/BSB")
 BSB <- read.csv("BSB1.csv", stringsAsFactors = FALSE)
-as_tibble(BSB)
 ```
 
 # Filtering
+Data set contains 835 records. However, Only 416 are filled in completely. 
 ```{r}
 BSB_F<-filter(BSB,CompletionStatus=="Completed")
+rm(BSB)
 ```
 
 # Creating Small/Medium/Large enterprise classification
 Using the turnover 2020 classification
+The categories were assigned by splitting up the categories in equal buckets. 
 ```{r}
 BSB_F$SML<- BSB_F$Annual.turnover.revenue.in.2020.
 
@@ -58,8 +71,10 @@ BSB_F<- BSB_F %>%
     SML = factor(SML, levels=c("Small","Medium","Large")))
 ```
 
-
 # Loss of income
+Responded turnover revenue in 2019 and 2020 was recoded to values.
+Following this a percentage change variable was created.
+
 ```{r}
 # Revenue 2019
 BSB_F<- BSB_F%>%
@@ -80,8 +95,6 @@ BSB_F<- BSB_F%>%
   ))
 
 BSB_F$Annual.turnover.revenue.in.2019.<- as.numeric(levels(BSB_F$Annual.turnover.revenue.in.2019.))[BSB_F$Annual.turnover.revenue.in.2019.]
-
-
 
 # Revenue 2020
 BSB_F<- BSB_F%>%
@@ -107,17 +120,72 @@ BSB_F$Annual.turnover.revenue.in.2020.<- as.numeric(levels(BSB_F$Annual.turnover
 # Loss of revenue in percent
 BSB_F$Income_loss_2020 <- 
   (BSB_F$Annual.turnover.revenue.in.2020. / BSB_F$Annual.turnover.revenue.in.2019. - 1) *100
+```
 
+```{r}
 # Summarize
 cbind<- BSB_F %>% 
   select(Income_loss_2020,Annual.turnover.revenue.in.2019.,
          Annual.turnover.revenue.in.2020., 
          SML, 
-         Thank.you.very.much.for.your.cooperation...Company.name, How.many.employees.did.you.have.on.January.1..2020.,
+         Thank.you.very.much.for.your.cooperation...Company.name, 
          When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.,
-         Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.,
-         Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.
+         How.many.employees.did.you.have.on.January.1..2020.
          )
+```
+
+
+
+Tabulate results of question 7 for comparison purposes
+Question 3: SZW and EZK options toegether (yes received compensation), second catetgory (Yes, financing relief) BMKB or GO +Qredits+Postponement of payment by the Caribbean Netherlands Tax , 3 No + blank
+
+various financial compensation schemes offered:
+
+• SZW emergency scheme, 80 percent allowance for wage costs
+
+• SZW emergency scheme, for independent entrepreneurs
+
+• EZK compensation for fixed costs (US$4.400 variant)
+
+• EZK compensation for fixed costs (US$2.200 variant)
+
+• EZK compensation, second installment (US$500 - US$55.000)
+
+• EZK compensation, third installment (US$375 - US$99.000)
+
+```{r}
+# Recieved compensation (SZW and EZK measures)
+cbind$Recieved_compensation <-ifelse(
+  BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..80..allowance.for.wage.costs=="SZW Emergency scheme, 80% allowance for wage costs" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....SZW.Emergency.scheme..for.independent.entrepreneurs=="SZW Emergency scheme, for independent entrepreneurs" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation..fourth.installment....425.....400.000.=="EZK compensation for fixed costs ($ 4.400 variant)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation.for.fixed.costs....2.200.variant.=="EZK compensation for fixed costs ($ 2.200 variant)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation..third.installment....375.....99.000.=="EZK compensation, third installment ($ 375 - $ 99.000)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation..second.installment....500.....55.000.=="EZK compensation, second installment ($ 500 - $ 55.000)" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....EZK.compensation.for.fixed.costs....4.400.variant.=="EZK compensation for fixed costs ($ 4.400 variant)",
+  "YES",
+  "NO"
+  ) 
+
+  
+# Recieved financing relief (BMKB or GO and Qredits and postponement tax) 
+# Upon inspection of the BMKB or Go, there were not a single observation there
+cbind$Recieved_financing_relief <-ifelse(
+  BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....Qredits.grace.period.and.or.a.bridging.loan=="Qredits grace period and/or a bridging loan" |
+    BSB_F$Have.you.made.use.of.the.previous.support.measures.from.the.government....Postponement.of.payment.by.the.Caribbean.Netherlands.Tax.authorities.for.3.months=="Postponement of payment by the Caribbean Netherlands Tax authorities for 3 months",
+  "YES",
+  "NO"
+)
+
+
+cbind$Recieved_non<-ifelse(cbind$Recieved_compensation=="YES" |
+                         cbind$Recieved_financing_relief=="YES",
+                         "Recieved",
+                         "Not_recieved"
+)
+
+
+cbind$Revenue_loss_2020 <- BSB_F$Could.you.give.an.estimate.of.the.loss.of.revenue..in.percentage..in.2020.as.a.result.of.COVID.19..compared.to.2019.
 ```
 
 
@@ -175,25 +243,33 @@ summary(model_probit)
 
 
 # Table
-library(gtsummary)
+
 
 tbl_regression(model_logit,
     exponentiate = TRUE)
 ```
 
 # Descriptives
-inspect variables
-```{r}
+**Chart 1: Revenue loss**
+```{r, echo=FALSE}
 ggplot(data=cbind, aes(x=Revenue_loss_2020)) +
     geom_bar(stat="count")+ coord_flip()+
   xlab(NULL)+
   ylab(NULL)
+```
 
+*Source: Bonaire Business Survey (2020)*
+
+**Chart 2: Received compensation**
+```{r, echo=FALSE}
 ggplot(data=cbind, aes(x=Recieved_compensation)) +
     geom_bar(stat="count")+ 
   xlab(NULL)+
   ylab(NULL)
 ```
+
+*Source: Bonaire Business Survey (2020)*
+
 
 # ANOVA
 ```{r}
@@ -244,6 +320,3 @@ tukey.plot.aov<-aov(Income_loss_2020 ~ Recieved_compensation:SML, data=cbind)
 tukey.plot.test<-TukeyHSD(tukey.plot.aov)
 plot(tukey.plot.test, las = 1)
 ```
-
-
-
