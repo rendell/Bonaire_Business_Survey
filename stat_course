@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Statistics course exerc"
 output:
   word_document: default
   html_document:
@@ -9,8 +9,7 @@ output:
 Continuation business survey analysis
 Attempted ANOVA:
 https://www.scribbr.com/statistics/anova-in-r/
-However, forgot the dependent variable is binary. 
-So moved back to Logit.
+
 
 
 
@@ -20,6 +19,166 @@ library(ggpubr)
 library(tidyverse)
 library(broom)
 library(AICcmodavg)
+```
+
+# Import data
+Uploaded from computer. CSV. file needs to be named to "BSB"
+Data is also converted to a tibble.
+```{r, message=FALSE}
+setwd("C:/Users/RendelldeKort/Desktop/BSB")
+BSB <- read.csv("BSB1.csv", stringsAsFactors = FALSE)
+as_tibble(BSB)
+```
+
+# Filtering
+```{r}
+BSB_F<-filter(BSB,CompletionStatus=="Completed")
+```
+
+# Creating Small/Medium/Large enterprise classification
+Using the turnover 2020 classification
+```{r}
+BSB_F$SML<- BSB_F$Annual.turnover.revenue.in.2020.
+
+BSB_F<- BSB_F %>%
+    mutate(SML = recode_factor(SML,
+                                                            
+                               "Lower than $ 10.000" = "Small",
+                               "Between $ 10.000 and $ 49.999" = "Small",
+                               "Between $ 50.000 and $ 99.000" = "Small",
+                               "Between $ 100.000 and $ 199.000" = "Small",
+                               "Between $ 200.000 and $ 349.999" = "Medium",
+                               "Between $ 350.000 and $ 499.999" = "Medium",
+                               "Between $ 500.000 and 749.999" = "Medium",
+                               "Between $ 750.000 and $ 999.999" = "Medium",
+                               "Between $ 1.000.000 and $ 1.499.999" = "Large",
+                               "Between $ 1.500.000 and $ 1.999.999" = "Large",
+                               "More than $ 2.000.000" = "Large"),
+
+    SML = factor(SML, levels=c("Small","Medium","Large")))
+```
+
+
+# Loss of income
+```{r}
+# Revenue 2019
+BSB_F<- BSB_F%>%
+  mutate(Annual.turnover.revenue.in.2019.=fct_recode(Annual.turnover.revenue.in.2019.,
+                               "5000"="Lower than $ 10.000",
+                               "30000"="Between $ 10.000 and $ 49.999",
+                               "74500"="Between $ 50.000 and $ 99.000" ,
+                               "149500"="Between $ 100.000 and $ 199.000",
+                               "275000"="Between $ 200.000 and $ 349.999",
+                               "425000"="Between $ 350.000 and $ 499.999" ,
+                               "625000"="Between $ 500.000 and 749.999",
+                               "875000"="Between $ 750.000 and $ 999.999",
+                               "1250000"="Between $ 1.000.000 and $ 1.499.999",
+                               "1750000"="Between $ 1.500.000 and $ 1.999.999",
+                               "2500000"="More than $ 2.000.000",
+                               "NA"="Unsure / Do not want to answer",
+                               "NA"=""
+  ))
+
+BSB_F$Annual.turnover.revenue.in.2019.<- as.numeric(levels(BSB_F$Annual.turnover.revenue.in.2019.))[BSB_F$Annual.turnover.revenue.in.2019.]
+
+
+
+# Revenue 2020
+BSB_F<- BSB_F%>%
+  mutate(Annual.turnover.revenue.in.2020.=fct_recode(Annual.turnover.revenue.in.2020.,
+                               "5000"="Lower than $ 10.000",
+                               "30000"="Between $ 10.000 and $ 49.999",
+                               "74500"="Between $ 50.000 and $ 99.000" ,
+                               "149500"="Between $ 100.000 and $ 199.000",
+                               "275000"="Between $ 200.000 and $ 349.999",
+                               "425000"="Between $ 350.000 and $ 499.999" ,
+                               "625000"="Between $ 500.000 and 749.999",
+                               "875000"="Between $ 750.000 and $ 999.999",
+                               "1250000"="Between $ 1.000.000 and $ 1.499.999",
+                               "1750000"="Between $ 1.500.000 and $ 1.999.999",
+                               "2500000"="More than $ 2.000.000",
+                               "NA"="Unsure / Do not want to answer",
+                               "NA"=""
+  ))
+
+BSB_F$Annual.turnover.revenue.in.2020.<- as.numeric(levels(BSB_F$Annual.turnover.revenue.in.2020.))[BSB_F$Annual.turnover.revenue.in.2020.]
+
+
+# Loss of revenue in percent
+BSB_F$Income_loss_2020 <- 
+  (BSB_F$Annual.turnover.revenue.in.2020. / BSB_F$Annual.turnover.revenue.in.2019. - 1) *100
+
+# Summarize
+cbind<- BSB_F %>% 
+  select(Income_loss_2020,Annual.turnover.revenue.in.2019.,
+         Annual.turnover.revenue.in.2020., 
+         SML, 
+         Thank.you.very.much.for.your.cooperation...Company.name, How.many.employees.did.you.have.on.January.1..2020.,
+         When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.,
+         Were.you.required.to.cease.operations.permanently.due.to.COVID.19.in.2020.,
+         Were.you.required.to.cease.operations.temporarily.due.to.COVID.19.in.2020.
+         )
+```
+
+
+# Removing outliers: https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/
+```{r}
+ggbetweenstats(cbind,SML,
+Income_loss_2020, outlier.tagging = TRUE)
+
+ggbetweenstats(cbind,SML,
+How.many.employees.did.you.have.on.January.1..2020., outlier.tagging = TRUE)
+
+Q <- quantile(na.omit(cbind$Income_loss_2020), probs=c(.25, .75), na.rm = FALSE)
+iqr <- IQR(na.omit(cbind$Income_loss_2020))
+
+up <-  Q[2]+1.5*iqr # Upper Range  
+low<- Q[1]-1.5*iqr # Lower Range
+
+eliminated<- subset(cbind, cbind$Income_loss_2020 > (Q[1] - 1.5*iqr) & cbind$Income_loss_2020 < (Q[2]+1.5*iqr))
+ggbetweenstats(eliminated, SML, Income_loss_2020, outlier.tagging = TRUE) 
+
+
+table_income_loss_2020_t <- eliminated %>% 
+  group_by(SML) %>% 
+  summarise(avg_income_loss=mean(Income_loss_2020,na.rm = TRUE),
+            avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
+            )
+
+
+table_income_loss_2020 <- eliminated %>% 
+  summarise(avg_income_loss=mean(Income_loss_2020,na.rm = TRUE),
+            avg_employee=mean(How.many.employees.did.you.have.on.January.1..2020.,na.rm = TRUE)
+            )
+
+table_expect_return <- cbind %>%
+  filter(!is.na(SML))%>%
+  group_by(SML)%>%
+  count(When.do.you.expect.to.return.to.pre.COVID.19.sales.levels.)
+```
+
+
+
+```{r}
+#Character variables had to be converted to factor first
+cbind$Revenue_loss_2020 <- as.factor(cbind$Revenue_loss_2020)
+
+# Logit model
+cbind$Recieved_compensation <- as.factor(cbind$Recieved_compensation)
+model_logit <- glm(Recieved_compensation ~ Revenue_loss_2020,family=binomial(link='logit'),data=cbind)
+summary(model_logit)
+
+
+# Probit model
+model_probit <- glm(Recieved_compensation ~ Revenue_loss_2020,family=binomial(link='probit'),data=cbind)
+summary(model_probit)
+
+
+# Table
+library(gtsummary)
+
+tbl_regression(model_logit,
+    exponentiate = TRUE)
 ```
 
 # Descriptives
