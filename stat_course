@@ -1,0 +1,90 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+Continuation business survey analysis
+Attempted ANOVA:
+https://www.scribbr.com/statistics/anova-in-r/
+However, forgot the dependent variable is binary. 
+So moved back to Logit.
+
+
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(broom)
+library(AICcmodavg)
+```
+
+# Descriptives
+inspect variables
+```{r}
+ggplot(data=cbind, aes(x=Revenue_loss_2020)) +
+    geom_bar(stat="count")+ coord_flip()+
+  xlab(NULL)+
+  ylab(NULL)
+
+ggplot(data=cbind, aes(x=Recieved_compensation)) +
+    geom_bar(stat="count")+ 
+  xlab(NULL)+
+  ylab(NULL)
+```
+
+# ANOVA
+```{r}
+anova <- aov(Income_loss_2020 ~ Recieved_compensation + SML , data=cbind)
+summary(anova)
+```
+Adding interaction
+```{r}
+anova_interaction <- aov(Income_loss_2020 ~ Recieved_compensation * SML , data=cbind)
+summary(anova)
+```
+
+The Akaike information criterion (AIC) is a good test for model fit. AIC calculates the information value of each model by balancing the variation explained against the number of parameters used.
+```{r}
+model.set <- list(anova, anova_interaction)
+model.names <- c("anova", "anova_interaction")
+
+aictab(model.set, modnames = model.names)
+```
+The model with the lowest AIC score (listed first in the table) is the best fit for the data
+
+Step 4: Check for homoscedasticity
+To check whether the model fits the assumption of homoscedasticity, look at the model diagnostic plots in R using the plot() function:
+```{r}
+par(mfrow=c(2,2))
+plot(anova_interaction)
+par(mfrow=c(1,1))
+```
+Step 5: Do a post-hoc test
+ANOVA tells us if there are differences among group means, but not what the differences are. To find out which groups are statistically different from one another, you can perform a Tukey’s Honestly Significant Difference (Tukey’s HSD) post-hoc test for pairwise comparisons:
+```{r}
+tukey.two.way<-TukeyHSD(anova_interaction)
+
+tukey.two.way
+```
+Step 6: Plot the results in a graph
+When plotting the results of a model, it is important to display:
+
+the raw data
+summary information, usually the mean and standard error of each group being compared
+letters or symbols above each group being compared to indicate the groupwise differences.
+Find the groupwise differences
+From the ANOVA test we know that both planting density and fertilizer type are significant variables. To display this information on a graph, we need to show which of the combinations of fertilizer type + planting density are statistically different from one another.
+
+To do this, we can run another ANOVA + TukeyHSD test, this time using the interaction of fertilizer and planting density. We aren’t doing this to find out if the interaction term is significant (we already know it’s not), but rather to find out which group means are statistically different from one another so we can add this information to the graph.
+```{r}
+tukey.plot.aov<-aov(Income_loss_2020 ~ Recieved_compensation:SML, data=cbind)
+tukey.plot.test<-TukeyHSD(tukey.plot.aov)
+plot(tukey.plot.test, las = 1)
+```
+
+
+
