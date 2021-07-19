@@ -1,9 +1,9 @@
 ---
 title: "Financial compensation assistance to firms post-COVID in Bonaire"
 output:
-  word_document: default
   html_document:
     df_print: paged
+  word_document: default
 ---
 
 # Did the financial compensation assistance reach the beneficiary firms most in need?
@@ -15,8 +15,6 @@ A key question is whether the government assistance offered reached those busine
 
 
 
-
-This project was part of a statistical class where the Bonaire business survey was used for further experimentation.
 
 
 Continuation business survey analysis attempted ANOVA:
@@ -188,9 +186,14 @@ cbind$Recieved_non<-ifelse(cbind$Recieved_compensation=="YES" |
 cbind$Revenue_loss_2020 <- BSB_F$Could.you.give.an.estimate.of.the.loss.of.revenue..in.percentage..in.2020.as.a.result.of.COVID.19..compared.to.2019.
 ```
 
+The resulting variable of businesses that received SZW or EZK compensation along with an income loss allows the application of a logistic regression.
+This statistical model uses a logistic function to model a binary dependent variable (Did the firm receive financial compensation, yes or no?).
 
-# Removing outliers: https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/
-```{r}
+# Removing outliers:
+
+https://www.r-bloggers.com/2020/01/how-to-remove-outliers-in-r/
+
+```{r, warning=FALSE}
 ggbetweenstats(cbind,SML,
 Income_loss_2020, outlier.tagging = TRUE)
 
@@ -227,7 +230,7 @@ table_expect_return <- cbind %>%
 
 
 
-```{r}
+```{r, message=FALSE}
 #Character variables had to be converted to factor first
 cbind$Revenue_loss_2020 <- as.factor(cbind$Revenue_loss_2020)
 
@@ -251,21 +254,25 @@ tbl_regression(model_logit,
 
 # Descriptives
 **Chart 1: Revenue loss**
+
 ```{r, echo=FALSE}
 ggplot(data=cbind, aes(x=Revenue_loss_2020)) +
     geom_bar(stat="count")+ coord_flip()+
   xlab(NULL)+
-  ylab(NULL)
+  ylab(NULL)+ theme_bw()
 ```
 
 *Source: Bonaire Business Survey (2020)*
 
+
+
 **Chart 2: Received compensation**
+
 ```{r, echo=FALSE}
 ggplot(data=cbind, aes(x=Recieved_compensation)) +
     geom_bar(stat="count")+ 
   xlab(NULL)+
-  ylab(NULL)
+  ylab(NULL)+ theme_bw()
 ```
 
 *Source: Bonaire Business Survey (2020)*
