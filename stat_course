@@ -6,21 +6,24 @@ output:
   word_document: default
 ---
 
-# Did the financial compensation assistance reach the beneficiary firms most in need?
-
-
-## Introduction
-A key question is whether the government assistance offered reached those businesses that were most severely affected in terms of reduced earnings due to the COVID-19 pandemic. Related is the assertion that perhaps small businesses (that were more vulnerable) were less likely to have received assistance.
 
 
 
+# 1. Introduction
+* Small island developing states (SIDS) face unprecedented challenges as they strive to recover from the impact of the COVID-19 crisis amid vulnerabilities worsened by the pandemic.
 
+* Bonaire, like different SIDS in the region are highly vulnerable to external economic and financial shocks.
 
+* COVID-19 has severely hit SIDS' service exports, heavily reliant on tourism.
 
-Continuation business survey analysis attempted ANOVA:
-https://www.scribbr.com/statistics/anova-in-r/
+* **This study uses a unique survey data set to document the efficacy of policy response: Did the government assistance offered reached those businesses that were most severely affected in terms of reduced earnings due to the COVID-19 pandemic?** 
+
+* *What is the contribution to literature?*
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE}
+#Continuation business survey analysis attempted ANOVA:
+# https://www.scribbr.com/statistics/anova-in-r/
+
 library(ggplot2)
 library(ggpubr)
 library(tidyverse)
@@ -38,17 +41,40 @@ setwd("C:/Users/RendelldeKort/Desktop/BSB")
 BSB <- read.csv("BSB1.csv", stringsAsFactors = FALSE)
 ```
 
-# Filtering
-Data set contains 835 records. However, Only 416 are filled in completely. 
+
+
+
+# 2. Literature Review
+* xxx
+
+* xxx
+
+* this work relates to papers illustrating the heterogeneous effects of the
+COVID-19 shutdown across industries. Papanikolaou and Schmidt (2020) finds that industries with fewer opportunities to work from home performed worse as measured by declines in employment, expected revenue growth, stock market performance, and expected likelihood of default.
+
+
+# 3. Methodology
+
+
+## 3.1 Survey design
+* The firm-level data used in this section are obtained from the Bonaire Business Survey (2021) which was executed by the World Bank in cooperation with OLB and the Chamber of Commerce between March 16 and March 26, 2021.
+
+* The survey focused on the impact of the COVID-19 pandemic as well as on the mitigating effect of financial support to firms.
+
+* the survey was promoted through social media and official government channels and firms were invited to fill out the survey online in English, Dutch, Papiamentu or Spanish.
+
+* In total, 835 responses were collected. However, Only 416 were filled in completely and were thus utilized.
 ```{r}
+# Filtering
 BSB_F<-filter(BSB,CompletionStatus=="Completed")
 rm(BSB)
 ```
 
-# Creating Small/Medium/Large enterprise classification
-Using the turnover 2020 classification
-The categories were assigned by splitting up the categories in equal buckets. 
+* Turnover revenue for 2019 and 2020 were categories were assigned by splitting up the categories in equal buckets. 
+
+
 ```{r}
+# creating classifications (Turnover revenue and S/M/L)
 BSB_F$SML<- BSB_F$Annual.turnover.revenue.in.2020.
 
 BSB_F<- BSB_F %>%
